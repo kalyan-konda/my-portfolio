@@ -15,6 +15,7 @@ function Contact() {
   };
 
   const [comment, setComment] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleCommentSubmit = async () => {
     if (!comment.trim()) {
@@ -23,11 +24,14 @@ function Contact() {
     }
 
     try {
-      const res = await fetch("http://localhost:3000/api/comment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ comment }),
-      });
+      const res = await fetch(
+        "https://my-portfolio-backend-9zsf.onrender.com/api/comment",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ comment }),
+        },
+      );
 
       const data = await res.json();
 
@@ -65,20 +69,50 @@ function Contact() {
   //   }
   // };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); //  START loading
 
-    const { name, email, message } = formData;
+    try {
+      const res = await fetch(
+        "https://my-portfolio-backend-9zsf.onrender.com/api/contact",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        },
+      );
 
-    const subject = encodeURIComponent(`Portfolio Contact from ${name}`);
-    const body = encodeURIComponent(
-      `Name: ${name}\nUser Email: ${email}\n\nMessage:\n${message}`,
-    );
+      const data = await res.json();
 
-    const gmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=kondak1904037@gmail.com&su=${subject}&body=${body}`;
-
-    window.open(gmailURL, "_blank");
+      if (res.ok) {
+        alert("Message sent successfully ✅");
+        setFormData({ name: "", email: "", message: "" });
+      } else {
+        alert(data.msg || "Failed to send");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Server is starting… please try again in a few seconds ⏳");
+    } finally {
+      setLoading(false); //  END loading
+    }
   };
+
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //
+  //   const { name, email, message } = formData;
+  //
+  //   const subject = encodeURIComponent(`Portfolio Contact from ${name}`);
+  //   const body = encodeURIComponent(
+  //     `Name: ${name}\nUser Email: ${email}\n\nMessage:\n${message}`,
+  //   );
+  //
+  //   const gmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=kondak1904037@gmail.com&su=${subject}&body=${body}`;
+  //
+  //   window.open(gmailURL, "_blank");
+  // };
 
   return (
     <>
@@ -150,13 +184,13 @@ function Contact() {
                   />
                 </div>
 
-                <button type="submit" className="btn-submit">
-                  Send Message
+                <button type="submit" className="btn-submit" disabled={loading}>
+                  {loading ? "Sending… ⏳" : "Send Message"}
                 </button>
               </form>
             </div>
 
-            <div style={{ paddingLeft: "2rem", borderLeft: "1px solid #eee" }}>
+            <div className="contact-info">
               <h3>Contact Information</h3>
               <p>
                 <strong>Email:</strong> kalyankonda1342@gmail.com
