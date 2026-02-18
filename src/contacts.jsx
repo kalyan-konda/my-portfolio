@@ -1,4 +1,5 @@
 import "./style.css";
+import Navbar from "./Navbar";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import resume from "./assets/KONDA_KALYAN_RESUME.pdf";
@@ -10,68 +11,35 @@ function Contact() {
     message: "",
   });
 
+  const [loading, setLoading] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const [comment, setComment] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleCommentSubmit = async () => {
-    if (!comment.trim()) {
-      alert("Please write a comment");
-      return;
-    }
-
-    try {
-      const res = await fetch(
-        "https://my-portfolio-backend-9zsf.onrender.com/api/comment",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ comment }),
-        },
-      );
-
-      const data = await res.json();
-
-      if (res.ok) {
-        alert("Comment sent successfully ✅");
-        setComment("");
-      } else {
-        alert(data.msg || "Failed to send comment");
-      }
-    } catch (error) {
-      alert("Backend not running ❌");
-    }
+  const validateForm = () => {
+    if (!formData.name.trim()) return "Name is required";
+    if (!formData.email.trim()) return "Email is required";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
+      return "Invalid email format";
+    if (!formData.message.trim()) return "Message is required";
+    return null;
   };
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-
-  //   try {
-  //     const res = await fetch("http://localhost:3000/api/contact", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify(formData),
-  //     });
-
-  //     const data = await res.json();
-
-  //     if (res.ok) {
-  //       alert("Message sent successfully ✅");
-  //       setFormData({ name: "", email: "", message: "" });
-  //     } else {
-  //       alert(data.msg || "Failed to send");
-  //     }
-  //   } catch (error) {
-  //     alert("Backend not running ❌");
-  //   }
-  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); //  START loading
+    setLoading(true);
+    setSuccessMsg("");
+    setErrorMsg("");
+
+    const validationError = validateForm();
+    if (validationError) {
+      setErrorMsg(validationError);
+      setLoading(false);
+      return;
+    }
 
     try {
       const res = await fetch(
@@ -85,56 +53,28 @@ function Contact() {
 
       const data = await res.json();
 
-      if (res.ok) {
-        alert("Message sent successfully ✅");
-        setFormData({ name: "", email: "", message: "" });
-      } else {
-        alert(data.msg || "Failed to send");
+      if (!res.ok) {
+        throw new Error(data.msg || "Request failed");
       }
+
+      setSuccessMsg("Message sent successfully ✅");
+      setFormData({ name: "", email: "", message: "" });
+      setTimeout(() => setSuccessMsg(""), 5000);
     } catch (error) {
       console.error(error);
-      alert("Server is starting… please try again in a few seconds ⏳");
+      if (error.message && error.message !== "Failed to fetch") {
+        setErrorMsg(error.message);
+      } else {
+        setErrorMsg("Server is starting… please try again in a few seconds ⏳");
+      }
     } finally {
-      setLoading(false); //  END loading
+      setLoading(false);
     }
   };
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //
-  //   const { name, email, message } = formData;
-  //
-  //   const subject = encodeURIComponent(`Portfolio Contact from ${name}`);
-  //   const body = encodeURIComponent(
-  //     `Name: ${name}\nUser Email: ${email}\n\nMessage:\n${message}`,
-  //   );
-  //
-  //   const gmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=kondak1904037@gmail.com&su=${subject}&body=${body}`;
-  //
-  //   window.open(gmailURL, "_blank");
-  // };
-
   return (
     <>
-      <div className="brand-left">
-        <span className="brand-dot"></span>
-        <span>Kalyan Konda</span>
-        <span className="brand-subtitle">Web Development Student @ Suthra</span>
-      </div>
-
-      <header>
-        <nav className="top-nav">
-          <Link to="/">Home</Link>
-          <a href={resume} target="_blank" rel="noreferrer">
-            Resume
-          </a>
-          <Link to="/projects">Projects</Link>
-          <Link to="/skills">Skills</Link>
-          <Link to="/contact" className="active">
-            Contact
-          </Link>
-        </nav>
-      </header>
+      <Navbar />
 
       <div className="container">
         <div className="page-content">
@@ -147,44 +87,53 @@ function Contact() {
             <div>
               <h3>Contact Form</h3>
 
+              {successMsg && <div className="success-msg">{successMsg}</div>}
+              {errorMsg && <div className="error-msg">{errorMsg}</div>}
+
               <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                  <label>Name</label>
+                  <label htmlFor="name">Name</label>
                   <input
+                    id="name"
                     type="text"
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
                     placeholder="Your Name"
+                    autoComplete="name"
                     required
                   />
                 </div>
 
                 <div className="form-group">
-                  <label>Email</label>
+                  <label htmlFor="email">Email</label>
                   <input
+                    id="email"
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="your@email.com"
+                    autoComplete="email"
                     required
                   />
                 </div>
 
                 <div className="form-group">
-                  <label>Message</label>
+                  <label htmlFor="message">Message</label>
                   <textarea
+                    id="message"
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
                     rows="5"
                     placeholder="How can I help you?"
+                    autoComplete="off"
                     required
                   />
                 </div>
 
-                <button type="submit" className="btn-submit" disabled={loading}>
+                <button type="submit" disabled={loading} className="btn-submit">
                   {loading ? "Sending… ⏳" : "Send Message"}
                 </button>
               </form>
@@ -198,27 +147,6 @@ function Contact() {
               <p>
                 <strong>Location:</strong> Guntur, India
               </p>
-
-              <h3 style={{ marginTop: "2.5rem" }}>Leave a Comment</h3>
-
-              <div className="form-group">
-                <textarea
-                  rows="4"
-                  placeholder="Share your thoughts..."
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  style={{ width: "100%" }}
-                />
-              </div>
-
-              <button
-                type="button"
-                className="btn-submit"
-                style={{ marginTop: "1rem", width: "100%" }}
-                onClick={handleCommentSubmit}
-              >
-                Send Comment
-              </button>
             </div>
           </div>
         </div>

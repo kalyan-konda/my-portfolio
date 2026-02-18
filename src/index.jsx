@@ -1,4 +1,5 @@
 import "./style.css";
+import Navbar from "./Navbar";
 import { Link } from "react-router-dom";
 import profileImg from "./assets/kalyan.jpeg";
 import resume from "./assets/KONDA_KALYAN_RESUME.pdf";
@@ -6,37 +7,14 @@ import resume from "./assets/KONDA_KALYAN_RESUME.pdf";
 function App() {
   return (
     <>
-      {/* Brand Section */}
-      <div className="brand-left">
-        <span className="brand-dot"></span>
-        <span>Kalyan Konda</span>
-        <span className="brand-subtitle">
-          Web Development Student @ Suthra
-        </span>
-      </div>
-
-      {/* Header */}
-      <header>
-        <nav className="top-nav">
-          <Link to="/" className="active">Home</Link>
-          <a href={resume} target="_blank" rel="noreferrer">Resume</a>
-          <Link to="/projects">Projects</Link>
-          <Link to="/skills">Skills</Link>
-          <Link to="/contact">Contact</Link>
-        </nav>
-      </header>
+      <Navbar />
 
       {/* Main Content */}
       <div className="container">
         <div className="split-layout">
-          
           {/* Profile Section */}
           <div className="profile-section">
-            <img
-              src={profileImg}
-              alt="Kalyan Konda"
-              className="profile-img"
-            />
+            <img src={profileImg} alt="Kalyan Konda" className="profile-img" />
           </div>
 
           {/* Content Section */}
@@ -48,9 +26,9 @@ function App() {
 
               <p className="bio-text">
                 I am a Web Development student at Suthra Software Solutions,
-                driven by a passion for building interactive and responsive
-                web applications. I recently completed my Bachelor's degree
-                in Information Technology from RVR&JC.
+                driven by a passion for building interactive and responsive web
+                applications. I recently completed my Bachelor's degree in
+                Information Technology from RVR&JC.
               </p>
 
               <p className="bio-text">
@@ -64,12 +42,23 @@ function App() {
 
             {/* Circle Navigation */}
             <div className="circle-nav-container">
-              <a href={resume} className="nav-circle resume" target="_blank" rel="noreferrer">
+              <a
+                href={resume}
+                className="nav-circle resume"
+                target="_blank"
+                rel="noreferrer"
+              >
                 Resume
               </a>
-              <Link to="/projects" className="nav-circle research">Projects</Link>
-              <Link to="/skills" className="nav-circle personal">Skills</Link>
-              <Link to="/contact" className="nav-circle outreach">Contact</Link>
+              <Link to="/projects" className="nav-circle research">
+                Projects
+              </Link>
+              <Link to="/skills" className="nav-circle personal">
+                Skills
+              </Link>
+              <Link to="/contact" className="nav-circle outreach">
+                Contact
+              </Link>
             </div>
           </div>
         </div>
